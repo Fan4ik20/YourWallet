@@ -48,3 +48,46 @@ class Wallet(WalletBase):
 
     class Config:
         orm_mode = True
+
+
+class TransactionsTypeBase(BaseModel):
+    name: str
+
+
+class TransactionsTypeCreate(TransactionsTypeBase):
+    pass
+
+
+class TransactionsType(TransactionsTypeBase):
+    id: PositiveInt
+
+    class Config:
+        orm_mode = True
+
+
+class TransactionsCategoryBase(BaseModel):
+    name: str
+
+
+class TransactionsCategoryCreate(TransactionsCategoryBase):
+    pass
+
+
+class TransactionsCategory(TransactionsCategoryBase):
+    id: PositiveInt
+
+    class Config:
+        orm_mode = True
+
+
+class TransactionBase(BaseModel):
+    pass
+
+
+class TransactionCreate(TransactionBase):
+    pass
+
+
+class Transaction(TransactionBase):
+    class Config:
+        orm_mode = True
