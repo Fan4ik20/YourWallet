@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Response
 from sqlalchemy.orm import Session
 
 import schemas
@@ -39,3 +39,15 @@ def get_user(user_id: int, db: Session = Depends(get_db)):
     errors.raise_not_found_if_none(user, 'User')
 
     return user
+
+
+@router.delete(
+    '/{user_id}/', response_class=Response,
+    status_code=status.HTTP_204_NO_CONTENT
+)
+def delete_user(user_id: int, db: Session = Depends(get_db)):
+    user = UsersInterface.get_user(db, user_id)
+
+    errors.raise_not_found_if_none(user, 'User')
+
+    UsersInterface.delete_user(db, user)

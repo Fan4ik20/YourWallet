@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, Response, status
 from sqlalchemy.orm import Session
 
 import schemas
@@ -50,3 +50,16 @@ def get_wallet(user_id: int, wallet_id: int, db: Session = Depends(get_db)):
     errors.raise_not_found_if_none(wallet, 'Wallet')
 
     return wallet
+
+
+@router.delete(
+    '/{wallet_id}/', status_code=status.HTTP_204_NO_CONTENT,
+    response_class=Response
+)
+def delete_wallet(user_id: int, wallet_id: int, db: Session = Depends(get_db)):
+    raise_404_if_user_not_exist(db, user_id)
+
+    wallet = WalletsInterface.get_user_wallet(db, user_id, wallet_id)
+    errors.raise_not_found_if_none(wallet, 'Wallet')
+
+    WalletsInterface.delete_user_wallet(db, wallet)

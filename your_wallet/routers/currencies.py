@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Response
 from sqlalchemy.orm import Session
 
 import schemas
@@ -45,3 +45,15 @@ def get_currency(currency_id: int, db: Session = Depends(get_db)):
     errors.raise_not_found_if_none(currency, 'Currency')
 
     return currency
+
+
+@router.delete(
+    '/{currency_id/}', response_class=Response,
+    status_code=status.HTTP_204_NO_CONTENT
+)
+def delete_currency(currency_id: int, db: Session = Depends(get_db)):
+    currency = CurrenciesInterface.get_currency(db, currency_id)
+
+    errors.raise_not_found_if_none(currency, 'Currency')
+
+    CurrenciesInterface.delete_currency(db, currency)

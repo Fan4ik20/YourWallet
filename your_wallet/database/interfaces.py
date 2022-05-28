@@ -43,6 +43,11 @@ class UsersInterface:
 
         return db_user
 
+    @staticmethod
+    def delete_user(db: Session, user: models.User) -> None:
+        db.delete(user)
+        db.commit()
+
 
 class CurrenciesInterface:
     @staticmethod
@@ -77,6 +82,11 @@ class CurrenciesInterface:
 
         return db_currency
 
+    @staticmethod
+    def delete_currency(db: Session, currency: models.Currency) -> None:
+        db.delete(currency)
+        db.commit()
+
 
 class WalletsInterface:
     @staticmethod
@@ -110,3 +120,8 @@ class WalletsInterface:
         db.refresh(db_wallet)
 
         return db_wallet
+
+    @staticmethod
+    def delete_user_wallet(db: Session, wallet: models.Wallet) -> None:
+        db.delete(wallet)
+        db.commit()
