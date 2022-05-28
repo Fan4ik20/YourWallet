@@ -5,7 +5,7 @@ import schemas
 import errors
 
 from dependencies import get_db, PaginationQueryParams
-from database.interfaces import TransactionsTypeInterface
+from database.interfaces import TransactionsTypesInterface
 
 
 router = APIRouter(prefix='/transactions/types', tags=['TransactionsTypes'])
@@ -16,7 +16,7 @@ def get_transactions_types(
         pagination_params: PaginationQueryParams = Depends(),
         db: Session = Depends(get_db)
 ):
-    return TransactionsTypeInterface.get_types(
+    return TransactionsTypesInterface.get_types(
         db, pagination_params.offset, pagination_params.limit
     )
 
@@ -29,7 +29,7 @@ def create_transactions_type(
         transactions_type: schemas.TransactionsTypeCreate,
         db: Session = Depends(get_db)
 ):
-    if TransactionsTypeInterface.get_type_by_name(
+    if TransactionsTypesInterface.get_type_by_name(
         db, transactions_type.name
     ):
         raise HTTPException(
@@ -37,7 +37,7 @@ def create_transactions_type(
             detail='TransactionsType with given name already exist'
         )
 
-    return TransactionsTypeInterface.create_type(db, transactions_type)
+    return TransactionsTypesInterface.create_type(db, transactions_type)
 
 
 @router.get(
@@ -47,7 +47,7 @@ def create_transactions_type(
 def get_transactions_type(
         transactions_type_id: int, db: Session = Depends(get_db)
 ):
-    transactions_type = TransactionsTypeInterface.get_type(
+    transactions_type = TransactionsTypesInterface.get_type(
         db, transactions_type_id
     )
 
@@ -63,10 +63,10 @@ def get_transactions_type(
 def delete_transactions_type(
         transactions_type_id: int, db: Session = Depends(get_db)
 ):
-    transactions_type = TransactionsTypeInterface.get_type(
+    transactions_type = TransactionsTypesInterface.get_type(
         db, transactions_type_id
     )
 
     errors.raise_not_found_if_none(transactions_type, 'TransactionsType')
 
-    TransactionsTypeInterface.delete_type(db, transactions_type)
+    TransactionsTypesInterface.delete_type(db, transactions_type)

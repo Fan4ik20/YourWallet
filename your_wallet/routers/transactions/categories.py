@@ -5,7 +5,7 @@ import schemas
 import errors
 
 from dependencies import get_db, PaginationQueryParams
-from database.interfaces import TransactionsCategoryInterface
+from database.interfaces import TransactionsCategoriesInterface
 
 router = APIRouter(
     prefix='/transactions/categories',
@@ -18,7 +18,7 @@ def get_transactions_categories(
         pagination_params: PaginationQueryParams = Depends(),
         db: Session = Depends(get_db)
 ):
-    return TransactionsCategoryInterface.get_categories(
+    return TransactionsCategoriesInterface.get_categories(
         db, pagination_params.offset, pagination_params.limit
     )
 
@@ -31,7 +31,7 @@ def create_transactions_category(
         transactions_category: schemas.TransactionsCategoryCreate,
         db: Session = Depends(get_db)
 ):
-    if TransactionsCategoryInterface.get_category_by_name(
+    if TransactionsCategoriesInterface.get_category_by_name(
         db, transactions_category.name
     ):
         raise HTTPException(
@@ -39,7 +39,7 @@ def create_transactions_category(
             detail='TransactionsCategory with given name already exist'
         )
 
-    return TransactionsCategoryInterface.create_category(
+    return TransactionsCategoriesInterface.create_category(
         db, transactions_category
     )
 
@@ -50,7 +50,7 @@ def create_transactions_category(
 def get_transactions_category(
         transactions_category_id: int, db: Session = Depends(get_db)
 ):
-    category = TransactionsCategoryInterface.get_category(
+    category = TransactionsCategoriesInterface.get_category(
         db, transactions_category_id
     )
 
@@ -66,12 +66,12 @@ def get_transactions_category(
 def delete_transactions_category(
         transactions_category_id: int, db: Session = Depends(get_db)
 ):
-    category = TransactionsCategoryInterface.get_category(
+    category = TransactionsCategoriesInterface.get_category(
         db, transactions_category_id
     )
 
     errors.raise_not_found_if_none(category, 'TransactionsCategory')
 
-    TransactionsCategoryInterface.delete_category(
+    TransactionsCategoriesInterface.delete_category(
         db, category
     )

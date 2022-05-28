@@ -70,15 +70,15 @@ class Transaction(WalletBase):
     )
 
     transaction_type_id = Column(
-        Integer, ForeignKey('transaction_types.id'), nullable=False
+        Integer, ForeignKey('transactions_types.id'), nullable=False
     )
-    transaction_type = relationship('TransactionType', backref='transactions')
+    transaction_type = relationship('TransactionsType', backref='transactions')
 
     transaction_category_id = Column(
-        Integer, ForeignKey('transaction_categories.id'), nullable=False
+        Integer, ForeignKey('transactions_categories.id'), nullable=False
     )
     transaction_category = relationship(
-        'TransactionCategory', backref='transactions'
+        'TransactionsCategory', backref='transactions'
     )
 
 
