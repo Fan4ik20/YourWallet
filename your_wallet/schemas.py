@@ -35,7 +35,7 @@ class Currency(BaseCurrency):
 class WalletBase(BaseCurrency):
     name: str
     total_amount: float
-    currency_id: PositiveInt
+    currency_id: PositiveInt | None = None
 
 
 class WalletCreate(WalletBase):
