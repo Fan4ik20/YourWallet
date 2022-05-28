@@ -131,32 +131,34 @@ class TransactionsCategoryInterface:
     @staticmethod
     def get_categories(
             db: Session, offset: int = 0, limit: int = 100
-    ) -> list[models.TransactionCategory]:
+    ) -> list[models.TransactionsCategory]:
         return db.scalars(
-            select(models.TransactionCategory).offset(offset).limit(limit)
+            select(models.TransactionsCategory).offset(offset).limit(limit)
         ).all()
 
     @staticmethod
     def get_category(
-            db: Session, transaction_category_id: int
-    ) -> models.TransactionCategory | None:
-        return db.get(models.TransactionCategory, transaction_category_id)
+            db: Session, transactions_category_id: int
+    ) -> models.TransactionsCategory | None:
+        return db.get(models.TransactionsCategory, transactions_category_id)
 
     @staticmethod
     def get_category_by_name(
             db: Session, name: str
-    ) -> models.TransactionCategory | None:
+    ) -> models.TransactionsCategory | None:
 
         return db.scalar(
-            select(models.TransactionCategory).filter_by(name=name)
+            select(models.TransactionsCategory).filter_by(name=name)
         )
 
     @staticmethod
     def create_category(
             db: Session,
-            transaction_category: schemas.TransactionCategoryCreate
-    ) -> models.TransactionCategory:
-        db_category = models.TransactionCategory(**transaction_category.dict())
+            transactions_category: schemas.TransactionsCategoryCreate
+    ) -> models.TransactionsCategory:
+        db_category = models.TransactionsCategory(
+            **transactions_category.dict()
+        )
 
         db.add(db_category)
         db.commit()
@@ -166,7 +168,48 @@ class TransactionsCategoryInterface:
 
     @staticmethod
     def delete_category(
-            db: Session, transaction_category: models.TransactionCategory
+            db: Session, transactions_category: models.TransactionsCategory
     ) -> None:
-        db.delete(transaction_category)
+        db.delete(transactions_category)
+        db.commit()
+
+
+class TransactionsTypeInterface:
+    @staticmethod
+    def get_types(
+            db: Session, offset: int = 0, limit: int = 100
+    ) -> list[models.TransactionsType]:
+        return db.scalars(
+            select(models.TransactionsType).offset(offset).limit(limit)
+        ).all()
+
+    @staticmethod
+    def get_type(db: Session, type_id: int) -> models.TransactionsType | None:
+        return db.get(models.TransactionsType, type_id)
+
+    @staticmethod
+    def get_type_by_name(
+            db: Session, name: str
+    ) -> models.TransactionsType | None:
+        return db.scalar(
+            select(models.TransactionsType).filter_by(name=name)
+        )
+
+    @staticmethod
+    def create_type(
+            db: Session, transactions_type: schemas.TransactionsTypeCreate
+    ) -> models.TransactionsType:
+        db_type = models.TransactionsType(**transactions_type.dict())
+
+        db.add(db_type)
+        db.commit()
+
+        db.refresh(db_type)
+        return db_type
+
+    @staticmethod
+    def delete_type(
+            db: Session, transactions_type: models.TransactionsType
+    ) -> None:
+        db.delete(transactions_type)
         db.commit()
