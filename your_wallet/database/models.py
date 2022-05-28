@@ -47,14 +47,14 @@ class TransactionType(WalletBase):
     __tablename__ = 'transaction_types'
 
     id = Column(Integer, primary_key=True)
-    name = Column(String(30), nullable=False)
+    name = Column(String(30), nullable=False, unique=True)
 
 
 class TransactionCategory(WalletBase):
     __tablename__ = 'transaction_categories'
 
     id = Column(Integer, primary_key=True)
-    name = Column(String(50), nullable=False)
+    name = Column(String(50), nullable=False, unique=True)
 
 
 class Transaction(WalletBase):
