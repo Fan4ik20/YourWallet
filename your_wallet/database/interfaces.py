@@ -125,3 +125,48 @@ class WalletsInterface:
     def delete_user_wallet(db: Session, wallet: models.Wallet) -> None:
         db.delete(wallet)
         db.commit()
+
+
+class TransactionsCategoryInterface:
+    @staticmethod
+    def get_categories(
+            db: Session, offset: int = 0, limit: int = 100
+    ) -> list[models.TransactionCategory]:
+        return db.scalars(
+            select(models.TransactionCategory).offset(offset).limit(limit)
+        ).all()
+
+    @staticmethod
+    def get_category(
+            db: Session, transaction_category_id: int
+    ) -> models.TransactionCategory | None:
+        return db.get(models.TransactionCategory, transaction_category_id)
+
+    @staticmethod
+    def get_category_by_name(
+            db: Session, name: str
+    ) -> models.TransactionCategory | None:
+
+        return db.scalar(
+            select(models.TransactionCategory).filter_by(name=name)
+        )
+
+    @staticmethod
+    def create_category(
+            db: Session,
+            transaction_category: schemas.TransactionCategoryCreate
+    ) -> models.TransactionCategory:
+        db_category = models.TransactionCategory(**transaction_category.dict())
+
+        db.add(db_category)
+        db.commit()
+
+        db.refresh(db_category)
+        return db_category
+
+    @staticmethod
+    def delete_category(
+            db: Session, transaction_category: models.TransactionCategory
+    ) -> None:
+        db.delete(transaction_category)
+        db.commit()
