@@ -29,8 +29,8 @@ def create_transactions_type(
         transactions_type: schemas.TransactionsTypeCreate,
         db: Session = Depends(get_db)
 ):
-    if TransactionsTypesInterface.get_type_by_name(
-        db, transactions_type.name.value
+    if TransactionsTypesInterface.get_type(
+        db, transactions_type.name
     ):
         raise HTTPException(
             status.HTTP_400_BAD_REQUEST,
@@ -41,14 +41,15 @@ def create_transactions_type(
 
 
 @router.get(
-    '/{transactions_type_id}/',
+    '/{transactions_type_name}/',
     response_model=schemas.TransactionsType
 )
 def get_transactions_type(
-        transactions_type_id: int, db: Session = Depends(get_db)
+        transactions_type_name: schemas.TransactionsTypeEnum,
+        db: Session = Depends(get_db)
 ):
     transactions_type = TransactionsTypesInterface.get_type(
-        db, transactions_type_id
+        db, transactions_type_name
     )
 
     errors.raise_not_found_if_none(transactions_type, 'TransactionsType')
@@ -57,14 +58,15 @@ def get_transactions_type(
 
 
 @router.delete(
-    '/{transactions_type_id}/', response_class=Response,
+    '/{transactions_type_name}/', response_class=Response,
     status_code=status.HTTP_204_NO_CONTENT
 )
 def delete_transactions_type(
-        transactions_type_id: int, db: Session = Depends(get_db)
+        transactions_type_name: schemas.TransactionsTypeEnum,
+        db: Session = Depends(get_db)
 ):
     transactions_type = TransactionsTypesInterface.get_type(
-        db, transactions_type_id
+        db, transactions_type_name.value
     )
 
     errors.raise_not_found_if_none(transactions_type, 'TransactionsType')

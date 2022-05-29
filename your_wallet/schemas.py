@@ -66,8 +66,6 @@ class TransactionsTypeCreate(TransactionsTypeBase):
 
 
 class TransactionsType(TransactionsTypeBase):
-    id: PositiveInt
-
     class Config:
         orm_mode = True
 
@@ -90,8 +88,8 @@ class TransactionsCategory(TransactionsCategoryBase):
 class TransactionBase(BaseModel):
     amount: float
 
-    transaction_type_id: int
-    transaction_category_id: int
+    transaction_type_name: TransactionsTypeEnum
+    transaction_category_id: PositiveInt
 
 
 class TransactionCreate(TransactionBase):
@@ -101,7 +99,7 @@ class TransactionCreate(TransactionBase):
 class Transaction(TransactionBase):
     id: PositiveInt
 
-    wallet_id: int
+    wallet_id: PositiveInt
 
     class Config:
         orm_mode = True

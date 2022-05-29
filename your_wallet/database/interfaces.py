@@ -181,16 +181,11 @@ class TransactionsTypesInterface:
         ).all()
 
     @staticmethod
-    def get_type(db: Session, type_id: int) -> models.TransactionsType | None:
-        return db.get(models.TransactionsType, type_id)
-
-    @staticmethod
-    def get_type_by_name(
-            db: Session, name: str
+    def get_type(
+            db: Session, type_name: schemas.TransactionsTypeEnum
     ) -> models.TransactionsType | None:
-        return db.scalar(
-            select(models.TransactionsType).filter_by(name=name)
-        )
+
+        return db.get(models.TransactionsType, type_name)
 
     @staticmethod
     def create_type(

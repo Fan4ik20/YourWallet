@@ -49,8 +49,7 @@ class Wallet(WalletBase):
 class TransactionsType(WalletBase):
     __tablename__ = 'transactions_types'
 
-    id = Column(Integer, primary_key=True)
-    name = Column(Enum(TransactionsTypeEnum), nullable=False, unique=True)
+    name = Column(Enum(TransactionsTypeEnum),  primary_key=True)
 
 
 class TransactionsCategory(WalletBase):
@@ -72,8 +71,9 @@ class Transaction(WalletBase):
         'Wallet', backref=backref('transactions', cascade='all, delete-orphan')
     )
 
-    transaction_type_id = Column(
-        Integer, ForeignKey('transactions_types.id'), nullable=False
+    transaction_type_name = Column(
+        Enum(TransactionsTypeEnum), ForeignKey('transactions_types.name'),
+        nullable=False
     )
     transaction_type = relationship('TransactionsType', backref='transactions')
 
