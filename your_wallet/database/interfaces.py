@@ -3,9 +3,16 @@ from sqlalchemy.orm import Session
 
 import schemas
 from schemas import TransactionsTypeEnum
-from database import models
+
+from database import models, settings
 
 from security import passwords
+
+
+class DbInterface:
+    @staticmethod
+    def create_tables() -> None:
+        models.WalletBase.metadata.create_all(bind=settings.wallet_engine)
 
 
 class UsersInterface:
