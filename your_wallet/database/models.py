@@ -1,7 +1,10 @@
-from sqlalchemy import Column, Integer, ForeignKey, String, DECIMAL
+from sqlalchemy import Column, Integer, ForeignKey, String, DECIMAL, Enum
 from sqlalchemy.orm import declarative_base, relationship, backref
+from sqlalchemy.orm.decl_api import DeclarativeMeta
 
-WalletBase = declarative_base()
+from schemas import TransactionsTypeEnum
+
+WalletBase: DeclarativeMeta = declarative_base()
 
 
 class User(WalletBase):
@@ -47,7 +50,7 @@ class TransactionsType(WalletBase):
     __tablename__ = 'transactions_types'
 
     id = Column(Integer, primary_key=True)
-    name = Column(String(30), nullable=False, unique=True)
+    name = Column(Enum(TransactionsTypeEnum), nullable=False, unique=True)
 
 
 class TransactionsCategory(WalletBase):

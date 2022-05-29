@@ -1,5 +1,5 @@
 from sqlalchemy import select
-from sqlalchemy.orm import Session, selectinload, joinedload
+from sqlalchemy.orm import Session
 
 import schemas
 from schemas import TransactionsTypeEnum
@@ -247,12 +247,13 @@ class TransactionsInterface:
 
     @staticmethod
     def _change_wallet_total_amount(
-            wallet: models.Wallet, transaction_type: str, amount: float
+            wallet: models.Wallet, transaction_type: TransactionsTypeEnum,
+            amount: float
     ) -> None:
 
-        if transaction_type.lower() == TransactionsTypeEnum.outcome.value:
+        if transaction_type == TransactionsTypeEnum.outcome:
             wallet.total_amount -= amount
-        elif transaction_type.lower() == TransactionsTypeEnum.income.value:
+        elif transaction_type == TransactionsTypeEnum.income:
             wallet.total_amount += amount
 
     @staticmethod
@@ -301,10 +302,10 @@ class TransactionsInterface:
     ) -> None:
         type_name = transaction.transaction_type.name
 
-        reversed_type_name: str = (
-            TransactionsTypeEnum.income.value
-            if type_name.lower() == TransactionsTypeEnum.outcome.value
-            else TransactionsTypeEnum.outcome.value
+        reversed_type_name = (
+            TransactionsTypeEnum.income
+            if type_name == TransactionsTypeEnum.outcome
+            else TransactionsTypeEnum.outcome
         )
 
         TransactionsInterface._change_wallet_total_amount(
