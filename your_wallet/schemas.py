@@ -3,7 +3,21 @@ from enum import Enum
 from pydantic import BaseModel, EmailStr, PositiveInt
 
 
-class UserBase(BaseModel):
+def to_camel(string: str) -> str:
+    split_string = string.split('_')
+
+    return ''.join(
+        [split_string[0]] + [word.capitalize() for word in split_string[1:]]
+    )
+
+
+class LowerCamelCaseBase(BaseModel):
+    class Config:
+        alias_generator = to_camel
+        allow_population_by_field_name = True
+
+
+class UserBase(LowerCamelCaseBase):
     username: str
     email: EmailStr
 
@@ -19,7 +33,7 @@ class User(UserBase):
         orm_mode = True
 
 
-class BaseCurrency(BaseModel):
+class BaseCurrency(LowerCamelCaseBase):
     name: str
 
 
@@ -57,7 +71,7 @@ class TransactionsTypeEnum(Enum):
     income = 'income'
 
 
-class TransactionsCategoryBase(BaseModel):
+class TransactionsCategoryBase(LowerCamelCaseBase):
     name: str
 
 
@@ -72,7 +86,7 @@ class TransactionsCategory(TransactionsCategoryBase):
         orm_mode = True
 
 
-class TransactionBase(BaseModel):
+class TransactionBase(LowerCamelCaseBase):
     amount: float
 
     transaction_type: TransactionsTypeEnum
