@@ -30,3 +30,7 @@ venv.bak/
 
 # JetBrains
 .idea
+
+
+# Mypy config
+.mypy.ini
