@@ -6,7 +6,7 @@ from database.models import WalletBase
 def raise_not_found_if_none(
         model_object: WalletBase | None, model_name: str,
         message: str | None = None
-):
+) -> None:
     if model_object is None:
         message = (
             message if message

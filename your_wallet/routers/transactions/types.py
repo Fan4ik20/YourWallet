@@ -30,7 +30,7 @@ def create_transactions_type(
         db: Session = Depends(get_db)
 ):
     if TransactionsTypesInterface.get_type_by_name(
-        db, transactions_type.name
+        db, transactions_type.name.value
     ):
         raise HTTPException(
             status.HTTP_400_BAD_REQUEST,
