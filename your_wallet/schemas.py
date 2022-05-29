@@ -57,19 +57,6 @@ class TransactionsTypeEnum(Enum):
     income = 'income'
 
 
-class TransactionsTypeBase(BaseModel):
-    name: TransactionsTypeEnum
-
-
-class TransactionsTypeCreate(TransactionsTypeBase):
-    pass
-
-
-class TransactionsType(TransactionsTypeBase):
-    class Config:
-        orm_mode = True
-
-
 class TransactionsCategoryBase(BaseModel):
     name: str
 
@@ -88,7 +75,7 @@ class TransactionsCategory(TransactionsCategoryBase):
 class TransactionBase(BaseModel):
     amount: float
 
-    transaction_type_name: TransactionsTypeEnum
+    transaction_type: TransactionsTypeEnum
     transaction_category_id: PositiveInt
 
 

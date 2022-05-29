@@ -171,42 +171,6 @@ class TransactionsCategoriesInterface:
         db.commit()
 
 
-class TransactionsTypesInterface:
-    @staticmethod
-    def get_types(
-            db: Session, offset: int = 0, limit: int = 100
-    ) -> list[models.TransactionsType]:
-        return db.scalars(
-            select(models.TransactionsType).offset(offset).limit(limit)
-        ).all()
-
-    @staticmethod
-    def get_type(
-            db: Session, type_name: schemas.TransactionsTypeEnum
-    ) -> models.TransactionsType | None:
-
-        return db.get(models.TransactionsType, type_name)
-
-    @staticmethod
-    def create_type(
-            db: Session, transactions_type: schemas.TransactionsTypeCreate
-    ) -> models.TransactionsType:
-        db_type = models.TransactionsType(**transactions_type.dict())
-
-        db.add(db_type)
-        db.commit()
-
-        db.refresh(db_type)
-        return db_type
-
-    @staticmethod
-    def delete_type(
-            db: Session, transactions_type: models.TransactionsType
-    ) -> None:
-        db.delete(transactions_type)
-        db.commit()
-
-
 class TransactionsInterface:
     @staticmethod
     def _get_filtered_select_with_joins(user_id: int, wallet_id: int):
@@ -271,7 +235,7 @@ class TransactionsInterface:
             db: Session, transaction: models.Transaction
     ) -> None:
         TransactionsInterface._change_wallet_total_amount(
-            transaction.wallet, transaction.transaction_type.name,
+            transaction.wallet, transaction.transaction_type,
             transaction.amount
         )
         db.commit()
@@ -295,7 +259,7 @@ class TransactionsInterface:
     def _change_wallet_total_amount_before_deleting(
             db: Session, transaction: models.Transaction
     ) -> None:
-        type_name = transaction.transaction_type.name
+        type_name = transaction.transaction_type
 
         reversed_type_name = (
             TransactionsTypeEnum.income
