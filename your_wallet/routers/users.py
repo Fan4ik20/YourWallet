@@ -7,7 +7,7 @@ import errors
 from dependencies import get_db, PaginationQueryParams
 from database.interfaces import UsersInterface
 
-router = APIRouter(prefix='/users', tags=['users'])
+router = APIRouter(prefix='/users', tags=['Users'])
 
 
 @router.get('/', response_model=list[schemas.User])

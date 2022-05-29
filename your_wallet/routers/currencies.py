@@ -8,7 +8,7 @@ from dependencies import get_db, PaginationQueryParams
 from database.interfaces import CurrenciesInterface
 
 
-router = APIRouter(prefix='/currencies', tags=['currencies'])
+router = APIRouter(prefix='/currencies', tags=['Currencies'])
 
 
 @router.get('/', response_model=list[schemas.Currency])

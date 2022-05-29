@@ -7,7 +7,7 @@ import errors
 from dependencies import get_db, PaginationQueryParams
 from database.interfaces import WalletsInterface, UsersInterface
 
-router = APIRouter(prefix='/{user_id}/wallets', tags=['wallets'])
+router = APIRouter(prefix='/{user_id}/wallets', tags=['Wallets'])
 
 
 def raise_404_if_user_not_exist(db: Session, user_id: int) -> None:
