@@ -29,11 +29,9 @@ def create_currency(
         currency: schemas.CurrencyCreate, db: Session = Depends(get_db)
 ):
 
-    if CurrenciesInterface.get_currency_by_name(db, currency.name):
-        raise HTTPException(
-            status.HTTP_400_BAD_REQUEST,
-            detail='Currency with given name already exist'
-        )
+    errors.raise_bad_request_if_exist_with_name(
+        CurrenciesInterface.get_currency_by_name(db, currency.name), 'Currency'
+    )
 
     return CurrenciesInterface.create_currency(db, currency)
 

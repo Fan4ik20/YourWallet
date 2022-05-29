@@ -29,13 +29,11 @@ def create_transactions_type(
         transactions_type: schemas.TransactionsTypeCreate,
         db: Session = Depends(get_db)
 ):
-    if TransactionsTypesInterface.get_type(
-        db, transactions_type.name
-    ):
-        raise HTTPException(
-            status.HTTP_400_BAD_REQUEST,
-            detail='TransactionsType with given name already exist'
-        )
+
+    errors.raise_bad_request_if_exist_with_name(
+        TransactionsTypesInterface.get_type(db, transactions_type.name),
+        'TransactionsType'
+    )
 
     return TransactionsTypesInterface.create_type(db, transactions_type)
 
@@ -66,7 +64,7 @@ def delete_transactions_type(
         db: Session = Depends(get_db)
 ):
     transactions_type = TransactionsTypesInterface.get_type(
-        db, transactions_type_name.value
+        db, transactions_type_name
     )
 
     errors.raise_not_found_if_none(transactions_type, 'TransactionsType')

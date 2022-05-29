@@ -31,13 +31,12 @@ def create_transactions_category(
         transactions_category: schemas.TransactionsCategoryCreate,
         db: Session = Depends(get_db)
 ):
-    if TransactionsCategoriesInterface.get_category_by_name(
-        db, transactions_category.name
-    ):
-        raise HTTPException(
-            status.HTTP_400_BAD_REQUEST,
-            detail='TransactionsCategory with given name already exist'
-        )
+
+    errors.raise_bad_request_if_exist_with_name(
+        TransactionsCategoriesInterface.get_category_by_name(
+            db, transactions_category.name
+        ), 'TransactionsCategory'
+    )
 
     return TransactionsCategoriesInterface.create_category(
         db, transactions_category
