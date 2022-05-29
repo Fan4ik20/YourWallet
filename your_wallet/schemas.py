@@ -1,4 +1,11 @@
+from enum import Enum
+
 from pydantic import BaseModel, EmailStr, PositiveInt
+
+
+class TransactionsTypeEnum(Enum):
+    outcome = 'outcome'
+    income = 'income'
 
 
 class UserBase(BaseModel):
@@ -81,7 +88,10 @@ class TransactionsCategory(TransactionsCategoryBase):
 
 
 class TransactionBase(BaseModel):
-    pass
+    amount: float
+
+    transaction_type_id: int
+    transaction_category_id: int
 
 
 class TransactionCreate(TransactionBase):
@@ -89,5 +99,9 @@ class TransactionCreate(TransactionBase):
 
 
 class Transaction(TransactionBase):
+    id: PositiveInt
+
+    wallet_id: int
+
     class Config:
         orm_mode = True
