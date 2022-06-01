@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Response, status
+from fastapi import APIRouter, Depends, Response, status, HTTPException
 from sqlalchemy.orm import Session
 
 import schemas
@@ -6,7 +6,8 @@ import errors
 
 from dependencies import get_db, PaginationQueryParams
 from database.interfaces import (
-    TransactionsInterface, UsersInterface, WalletsInterface
+    TransactionsInterface, UsersInterface, WalletsInterface,
+    TransactionsCategoriesInterface
 )
 
 
@@ -23,6 +24,18 @@ def raise_404_if_user_or_wallet_is_none(
 
     wallet = WalletsInterface.get_user_wallet(db, user_id, wallet_id)
     errors.raise_not_found_if_none(wallet, 'Wallet')
+
+
+def raise_422_if_transactions_category_id_not_valid(
+        db: Session, category_id: int
+) -> None:
+    category = TransactionsCategoriesInterface.get_category(db, category_id)
+
+    if category is None:
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail='Transactions Category with given id does not exist',
+        )
 
 
 @router.get('/', response_model=list[schemas.Transaction])
@@ -48,6 +61,9 @@ def create_transaction(
         db: Session = Depends(get_db)
 ):
     raise_404_if_user_or_wallet_is_none(db, user_id, wallet_id)
+    raise_422_if_transactions_category_id_not_valid(
+        db, transaction.transaction_category_id
+    )
 
     return TransactionsInterface.create_transaction(
         db, wallet_id, transaction
