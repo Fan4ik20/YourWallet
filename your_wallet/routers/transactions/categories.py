@@ -1,11 +1,13 @@
-from fastapi import APIRouter, Depends, Response, status, HTTPException
+from fastapi import APIRouter, Depends, Response, status
 from sqlalchemy.orm import Session
 
 import schemas
 import errors
 
 from dependencies import get_db, PaginationQueryParams
-from database.interfaces import TransactionsCategoriesInterface
+from database.interfaces.transactions_categories_interface import (
+    TransactionsCategoriesInterface
+)
 
 router = APIRouter(
     prefix='/transactions/categories',

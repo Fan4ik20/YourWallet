@@ -1,11 +1,11 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Response
+from fastapi import APIRouter, Depends, status, Response
 from sqlalchemy.orm import Session
 
 import schemas
 import errors
 
 from dependencies import get_db, PaginationQueryParams
-from database.interfaces import CurrenciesInterface
+from database.interfaces.currencies_interface import CurrenciesInterface
 
 
 router = APIRouter(prefix='/currencies', tags=['Currencies'])

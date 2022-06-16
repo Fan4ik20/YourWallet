@@ -5,8 +5,11 @@ import schemas
 import errors
 
 from dependencies import get_db, PaginationQueryParams
-from database.interfaces import (
-    TransactionsInterface, UsersInterface, WalletsInterface,
+
+from database.interfaces.transactions_interface import TransactionsInterface
+from database.interfaces.users_interface import UsersInterface
+from database.interfaces.wallets_interface import WalletsInterface
+from database.interfaces.transactions_categories_interface import (
     TransactionsCategoriesInterface
 )
 

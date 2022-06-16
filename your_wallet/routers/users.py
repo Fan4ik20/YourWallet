@@ -5,7 +5,7 @@ import schemas
 import errors
 
 from dependencies import get_db, PaginationQueryParams
-from database.interfaces import UsersInterface
+from database.interfaces.users_interface import UsersInterface
 
 router = APIRouter(prefix='/users', tags=['Users'])
 
@@ -15,6 +15,13 @@ def get_users(
         pagination_params: PaginationQueryParams = Depends(),
         db: Session = Depends(get_db)
 ):
+    """Pobieranie wszystkich uzytkownikow z bazy danych<br>
+    Query parametry:
+    - **offset**: odstep od poczatku
+    - **limit**: ograniczanie liczby uzytkownikow na jedno zadanie
+
+    """
+
     return UsersInterface.get_all_users(
         db, pagination_params.offset, pagination_params.limit
     )
@@ -23,7 +30,14 @@ def get_users(
 @router.post(
     '/', response_model=schemas.User, status_code=status.HTTP_201_CREATED
 )
-def create_user(user: schemas.UserCreate, db = Depends(get_db)):
+def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
+    """Tworzenie uzytkownika z takimi danymi:
+    - **username**: obowiazkowe pole
+    - **email**: obowiazkowe pole
+    - **password**: obowiazkowe pole
+
+    """
+
     if UsersInterface.get_user_by_email(db, user.email):
         raise HTTPException(
             status.HTTP_400_BAD_REQUEST, detail='Email already registered'
@@ -34,6 +48,12 @@ def create_user(user: schemas.UserCreate, db = Depends(get_db)):
 
 @router.get('/{user_id}/', response_model=schemas.User)
 def get_user(user_id: int, db: Session = Depends(get_db)):
+    """Pobieranie jednego uzytkownika z bazy danych
+    Parametry:
+    - **user_id**: pole obowiazkowe
+
+    """
+
     user = UsersInterface.get_user(db, user_id)
 
     errors.raise_not_found_if_none(user, 'User')
@@ -46,6 +66,12 @@ def get_user(user_id: int, db: Session = Depends(get_db)):
     status_code=status.HTTP_204_NO_CONTENT
 )
 def delete_user(user_id: int, db: Session = Depends(get_db)):
+    """Usuwanie uzytwkownika z bazy danych
+    Parametry:
+    - **user_id**: pole obowiazkowe
+
+    """
+
     user = UsersInterface.get_user(db, user_id)
 
     errors.raise_not_found_if_none(user, 'User')

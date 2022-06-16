@@ -5,7 +5,9 @@ import schemas
 import errors
 
 from dependencies import get_db, PaginationQueryParams
-from database.interfaces import WalletsInterface, UsersInterface
+
+from database.interfaces.wallets_interface import WalletsInterface
+from database.interfaces.users_interface import UsersInterface
 
 router = APIRouter(prefix='/{user_id}/wallets', tags=['Wallets'])
 
@@ -36,6 +38,9 @@ def create_wallet(
         user_id: int, wallet: schemas.WalletCreate,
         db: Session = Depends(get_db)
 ):
+    # TODO add checking on existing currency.
+    # TODO Remove currency id, make name primary key.
+
     raise_404_if_user_not_exist(db, user_id)
 
     return WalletsInterface.create_wallet(db, user_id, wallet)
