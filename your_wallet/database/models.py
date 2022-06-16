@@ -21,9 +21,7 @@ class User(WalletBase):
 class Currency(WalletBase):
     __tablename__ = 'currencies'
 
-    id = Column(Integer, primary_key=True)
-
-    name = Column(String(50), nullable=False, unique=True)
+    name = Column(String(50), primary_key=True)
 
 
 class Wallet(WalletBase):
