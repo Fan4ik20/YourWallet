@@ -28,6 +28,12 @@ class UsersInterface:
         )
 
     @staticmethod
+    def get_user_by_username(db: Session, username: str) -> models.User | None:
+        return db.scalar(
+            select(models.User).filter_by(username=username)
+        )
+
+    @staticmethod
     def create_user(db: Session, user: schemas.UserCreate) -> models.User:
         hashed_password = passwords.get_password_hash(user.password)
 

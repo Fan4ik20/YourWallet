@@ -40,15 +40,14 @@ class Wallet(WalletBase):
         'User', backref=backref('wallets', cascade='all, delete-orphan')
     )
 
-    currency_id = Column(Integer, ForeignKey('currencies.id'))
+    currency_name = Column(String(50), ForeignKey('currencies.name'))
     currency = relationship('Currency', backref='wallets')
 
 
 class TransactionsCategory(WalletBase):
     __tablename__ = 'transactions_categories'
 
-    id = Column(Integer, primary_key=True)
-    name = Column(String(50), nullable=False, unique=True)
+    name = Column(String(50), primary_key=True)
 
 
 class Transaction(WalletBase):
@@ -67,8 +66,8 @@ class Transaction(WalletBase):
         Enum(TransactionsTypeEnum), nullable=False
     )
 
-    transaction_category_id = Column(
-        Integer, ForeignKey('transactions_categories.id'), nullable=False
+    transaction_category_name = Column(
+        String(50), ForeignKey('transactions_categories.name'), nullable=False
     )
     transaction_category = relationship(
         'TransactionsCategory', backref='transactions'

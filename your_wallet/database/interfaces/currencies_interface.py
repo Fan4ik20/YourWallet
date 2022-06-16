@@ -16,14 +16,10 @@ class CurrenciesInterface:
         ).all()
 
     @staticmethod
-    def get_currency(db: Session, currency_id: int) -> models.Currency | None:
-        return db.get(models.Currency, currency_id)
-
-    @staticmethod
-    def get_currency_by_name(db: Session, name: str) -> models.Currency | None:
-        return db.scalar(
-            select(models.Currency).filter_by(name=name)
-        )
+    def get_currency(
+            db: Session, currency_name: str
+    ) -> models.Currency | None:
+        return db.get(models.Currency, currency_name)
 
     @staticmethod
     def create_currency(

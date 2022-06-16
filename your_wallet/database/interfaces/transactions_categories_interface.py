@@ -17,16 +17,10 @@ class TransactionsCategoriesInterface:
 
     @staticmethod
     def get_category(
-            db: Session, transactions_category_id: int
+            db: Session, transactions_category_name: str
     ) -> models.TransactionsCategory | None:
-        return db.get(models.TransactionsCategory, transactions_category_id)
-
-    @staticmethod
-    def get_category_by_name(
-            db: Session, name: str
-    ) -> models.TransactionsCategory | None:
-        return db.scalar(
-            select(models.TransactionsCategory).filter_by(name=name)
+        return db.get(
+            models.TransactionsCategory, transactions_category_name
         )
 
     @staticmethod
