@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, status, Response
 from sqlalchemy.orm import Session
 
+import exc
 import schemas
-import errors
 
 from dependencies import get_db, PaginationQueryParams
 from database.interfaces.currencies_interface import CurrenciesInterface
@@ -28,19 +28,18 @@ def get_currencies(
 def create_currency(
         currency: schemas.CurrencyCreate, db: Session = Depends(get_db)
 ):
-
-    errors.raise_bad_request_if_exist_with_name(
-        CurrenciesInterface.get_currency_by_name(db, currency.name), 'Currency'
-    )
+    if CurrenciesInterface.get_currency(db, currency.name):
+        raise exc.ObjectWithGivenAttrExist('Currency', 'name')
 
     return CurrenciesInterface.create_currency(db, currency)
 
 
-@router.get('/{currency_id}/', response_model=schemas.Currency)
-def get_currency(currency_id: int, db: Session = Depends(get_db)):
-    currency = CurrenciesInterface.get_currency(db, currency_id)
+@router.get('/{currency_name}/', response_model=schemas.Currency)
+def get_currency(currency_name: str, db: Session = Depends(get_db)):
+    currency = CurrenciesInterface.get_currency(db, currency_name)
 
-    errors.raise_not_found_if_none(currency, 'Currency')
+    if currency is None:
+        raise exc.ObjectNotExist('Currency')
 
     return currency
 
@@ -49,9 +48,10 @@ def get_currency(currency_id: int, db: Session = Depends(get_db)):
     '/{currency_id/}', response_class=Response,
     status_code=status.HTTP_204_NO_CONTENT
 )
-def delete_currency(currency_id: int, db: Session = Depends(get_db)):
-    currency = CurrenciesInterface.get_currency(db, currency_id)
+def delete_currency(currency_name: str, db: Session = Depends(get_db)):
+    currency = CurrenciesInterface.get_currency(db, currency_name)
 
-    errors.raise_not_found_if_none(currency, 'Currency')
+    if currency is None:
+        raise exc.ObjectNotExist('Currency')
 
     CurrenciesInterface.delete_currency(db, currency)

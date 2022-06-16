@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, Response, status
 from sqlalchemy.orm import Session
 
+import exc
 import schemas
-import errors
 
 from dependencies import get_db, PaginationQueryParams
 from database.interfaces.transactions_categories_interface import (
@@ -33,12 +33,10 @@ def create_transactions_category(
         transactions_category: schemas.TransactionsCategoryCreate,
         db: Session = Depends(get_db)
 ):
-
-    errors.raise_bad_request_if_exist_with_name(
-        TransactionsCategoriesInterface.get_category_by_name(
+    if TransactionsCategoriesInterface.get_category(
             db, transactions_category.name
-        ), 'TransactionsCategory'
-    )
+    ):
+        raise exc.ObjectWithGivenAttrExist('TransactionsCategory', 'na')
 
     return TransactionsCategoriesInterface.create_category(
         db, transactions_category
@@ -46,32 +44,35 @@ def create_transactions_category(
 
 
 @router.get(
-    '/{transactions_category_id}/', response_model=schemas.TransactionsCategory
+    '/{transactions_category_name}/',
+    response_model=schemas.TransactionsCategory
 )
 def get_transactions_category(
-        transactions_category_id: int, db: Session = Depends(get_db)
+        transactions_category_name: str, db: Session = Depends(get_db)
 ):
     category = TransactionsCategoriesInterface.get_category(
-        db, transactions_category_id
+        db, transactions_category_name
     )
 
-    errors.raise_not_found_if_none(category, 'TransactionsCategory')
+    if category is None:
+        raise exc.ObjectNotExist('TransactionsCategory')
 
     return category
 
 
 @router.delete(
-    '/{transactions_category_id}/', response_class=Response,
+    '/{transactions_category_name}/', response_class=Response,
     status_code=status.HTTP_204_NO_CONTENT
 )
 def delete_transactions_category(
-        transactions_category_id: int, db: Session = Depends(get_db)
+        transactions_category_name: str, db: Session = Depends(get_db)
 ):
     category = TransactionsCategoriesInterface.get_category(
-        db, transactions_category_id
+        db, transactions_category_name
     )
 
-    errors.raise_not_found_if_none(category, 'TransactionsCategory')
+    if category is None:
+        raise exc.ObjectNotExist('TransactionsCategory')
 
     TransactionsCategoriesInterface.delete_category(
         db, category

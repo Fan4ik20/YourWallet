@@ -2,20 +2,22 @@ from fastapi import APIRouter, Depends, Response, status
 from sqlalchemy.orm import Session
 
 import schemas
-import errors
+import exc
 
 from dependencies import get_db, PaginationQueryParams
 
 from database.interfaces.wallets_interface import WalletsInterface
 from database.interfaces.users_interface import UsersInterface
+from database.interfaces.currencies_interface import CurrenciesInterface
 
 router = APIRouter(prefix='/{user_id}/wallets', tags=['Wallets'])
 
 
-def raise_404_if_user_not_exist(db: Session, user_id: int) -> None:
+def raise_user_not_exist_if_none(db: Session, user_id: int) -> None:
     user = UsersInterface.get_user(db, user_id)
 
-    errors.raise_not_found_if_none(user, 'User')
+    if user is None:
+        raise exc.ObjectNotExist('User')
 
 
 @router.get('/', response_model=list[schemas.Wallet])
@@ -24,7 +26,7 @@ def get_wallets(
         pagination_params: PaginationQueryParams = Depends(),
         db: Session = Depends(get_db)
 ):
-    raise_404_if_user_not_exist(db, user_id)
+    raise_user_not_exist_if_none(db, user_id)
 
     return WalletsInterface.get_user_wallets(
         db, user_id, pagination_params.offset, pagination_params.limit
@@ -38,21 +40,22 @@ def create_wallet(
         user_id: int, wallet: schemas.WalletCreate,
         db: Session = Depends(get_db)
 ):
-    # TODO add checking on existing currency.
-    # TODO Remove currency id, make name primary key.
+    raise_user_not_exist_if_none(db, user_id)
 
-    raise_404_if_user_not_exist(db, user_id)
+    if CurrenciesInterface.get_currency(db, wallet.currency_name):
+        raise exc.ObjectNotExist('Currency')
 
     return WalletsInterface.create_wallet(db, user_id, wallet)
 
 
 @router.get('/{wallet_id}/', response_model=schemas.Wallet)
 def get_wallet(user_id: int, wallet_id: int, db: Session = Depends(get_db)):
-    raise_404_if_user_not_exist(db, user_id)
+    raise_user_not_exist_if_none(db, user_id)
 
     wallet = WalletsInterface.get_user_wallet(db, user_id, wallet_id)
 
-    errors.raise_not_found_if_none(wallet, 'Wallet')
+    if wallet is None:
+        raise exc.ObjectNotExist('Wallet')
 
     return wallet
 
@@ -62,9 +65,10 @@ def get_wallet(user_id: int, wallet_id: int, db: Session = Depends(get_db)):
     response_class=Response
 )
 def delete_wallet(user_id: int, wallet_id: int, db: Session = Depends(get_db)):
-    raise_404_if_user_not_exist(db, user_id)
+    raise_user_not_exist_if_none(db, user_id)
 
     wallet = WalletsInterface.get_user_wallet(db, user_id, wallet_id)
-    errors.raise_not_found_if_none(wallet, 'Wallet')
+    if wallet is None:
+        raise exc.ObjectNotExist('Wallet')
 
     WalletsInterface.delete_user_wallet(db, wallet)
