@@ -49,7 +49,7 @@ class Currency(BaseCurrency):
 class WalletBase(BaseCurrency):
     name: str
     total_amount: float
-    currency_id: PositiveInt | None = None
+    currency_name: str | None = None
 
 
 class WalletCreate(WalletBase):
@@ -78,7 +78,6 @@ class TransactionsCategoryCreate(TransactionsCategoryBase):
 
 
 class TransactionsCategory(TransactionsCategoryBase):
-    id: PositiveInt
 
     class Config:
         orm_mode = True
@@ -88,7 +87,7 @@ class TransactionBase(LowerCamelCaseBase):
     amount: float
 
     transaction_type: TransactionsTypeEnum
-    transaction_category_id: PositiveInt
+    transaction_category_name: str
 
 
 class TransactionCreate(TransactionBase):
