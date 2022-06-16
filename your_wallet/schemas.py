@@ -42,8 +42,6 @@ class CurrencyCreate(BaseCurrency):
 
 
 class Currency(BaseCurrency):
-    id: PositiveInt
-
     class Config:
         orm_mode = True
 
