@@ -19,7 +19,11 @@ class CurrenciesInterface:
     def get_currency(
             db: Session, currency_name: str
     ) -> models.Currency | None:
-        return db.get(models.Currency, currency_name)
+        return db.scalar(
+            select(models.Currency).filter_by(
+                name=currency_name
+            )
+        )
 
     @staticmethod
     def create_currency(

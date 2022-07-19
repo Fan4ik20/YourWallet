@@ -1,13 +1,19 @@
-from database.settings import WalletSession
+from typing import Callable
+
+from sqlalchemy.orm import sessionmaker
 
 
-def get_db() -> WalletSession:
-    db = WalletSession()
+class WalletDb:
+    def __init__(self):
+        raise NotImplementedError
 
-    try:
-        yield db
-    finally:
-        db.close()
+
+def get_db_session(sessionmaker_: sessionmaker) -> Callable:
+    def get_db():
+        with sessionmaker_() as db:
+            yield db
+
+    return get_db()
 
 
 class PaginationQueryParams:

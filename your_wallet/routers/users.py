@@ -2,9 +2,9 @@ from fastapi import APIRouter, Depends, status, Response
 from sqlalchemy.orm import Session
 
 import schemas
-import exc
+from exceptions import exc
 
-from dependencies import get_db, PaginationQueryParams
+from dependencies import WalletDb, PaginationQueryParams
 from database.interfaces.users_interface import UsersInterface
 
 router = APIRouter(prefix='/users', tags=['Users'])
@@ -13,7 +13,7 @@ router = APIRouter(prefix='/users', tags=['Users'])
 @router.get('/', response_model=list[schemas.User])
 def get_users(
         pagination_params: PaginationQueryParams = Depends(),
-        db: Session = Depends(get_db)
+        db: Session = Depends(WalletDb)
 ):
     """Pobieranie wszystkich uzytkownikow z bazy danych<br>
     Query parametry:
@@ -30,7 +30,7 @@ def get_users(
 @router.post(
     '/', response_model=schemas.User, status_code=status.HTTP_201_CREATED
 )
-def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
+def create_user(user: schemas.UserCreate, db: Session = Depends(WalletDb)):
     """Tworzenie uzytkownika z takimi danymi:
     - **username**: obowiazkowe pole
     - **email**: obowiazkowe pole
@@ -48,7 +48,7 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
 
 
 @router.get('/{user_id}/', response_model=schemas.User)
-def get_user(user_id: int, db: Session = Depends(get_db)):
+def get_user(user_id: int, db: Session = Depends(WalletDb)):
     """Pobieranie jednego uzytkownika z bazy danych
     Parametry:
     - **user_id**: pole obowiazkowe
@@ -67,7 +67,7 @@ def get_user(user_id: int, db: Session = Depends(get_db)):
     '/{user_id}/', response_class=Response,
     status_code=status.HTTP_204_NO_CONTENT
 )
-def delete_user(user_id: int, db: Session = Depends(get_db)):
+def delete_user(user_id: int, db: Session = Depends(WalletDb)):
     """Usuwanie uzytwkownika z bazy danych
     Parametry:
     - **user_id**: pole obowiazkowe

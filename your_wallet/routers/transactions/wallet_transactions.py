@@ -1,10 +1,10 @@
-from fastapi import APIRouter, Depends, Response, status, HTTPException
+from fastapi import APIRouter, Depends, Response, status
 from sqlalchemy.orm import Session
 
 import schemas
-import exc
+from exceptions import exc
 
-from dependencies import get_db, PaginationQueryParams
+from dependencies import WalletDb, PaginationQueryParams
 
 from database.interfaces.transactions_interface import TransactionsInterface
 from database.interfaces.users_interface import UsersInterface
@@ -41,7 +41,7 @@ def raise_category_not_exist_if_none(db: Session, category_name: str):
 def get_transactions(
         user_id: int, wallet_id: int,
         pagination_params: PaginationQueryParams = Depends(),
-        db: Session = Depends(get_db)
+        db: Session = Depends(WalletDb)
 ):
     raise_user_or_wallet_not_exist_if_none(db, user_id, wallet_id)
 
@@ -57,7 +57,7 @@ def get_transactions(
 )
 def create_transaction(
         user_id: int, wallet_id: int, transaction: schemas.TransactionCreate,
-        db: Session = Depends(get_db)
+        db: Session = Depends(WalletDb)
 ):
     raise_user_or_wallet_not_exist_if_none(db, user_id, wallet_id)
     raise_category_not_exist_if_none(db, transaction.transaction_category_name)
@@ -70,7 +70,7 @@ def create_transaction(
 @router.get('/{transaction_id}/', response_model=schemas.Transaction)
 def get_transaction(
         user_id: int, wallet_id: int, transaction_id: int,
-        db: Session = Depends(get_db)
+        db: Session = Depends(WalletDb)
 ):
     raise_user_or_wallet_not_exist_if_none(db, user_id, wallet_id)
 
@@ -90,7 +90,7 @@ def get_transaction(
 )
 def delete_transaction(
         user_id: int, wallet_id: int, transaction_id: int,
-        db: Session = Depends(get_db)
+        db: Session = Depends(WalletDb)
 ):
     raise_user_or_wallet_not_exist_if_none(db, user_id, wallet_id)
 

@@ -2,9 +2,9 @@ from fastapi import APIRouter, Depends, Response, status
 from sqlalchemy.orm import Session
 
 import schemas
-import exc
+from exceptions import exc
 
-from dependencies import get_db, PaginationQueryParams
+from dependencies import WalletDb, PaginationQueryParams
 
 from database.interfaces.wallets_interface import WalletsInterface
 from database.interfaces.users_interface import UsersInterface
@@ -24,7 +24,7 @@ def raise_user_not_exist_if_none(db: Session, user_id: int) -> None:
 def get_wallets(
         user_id: int,
         pagination_params: PaginationQueryParams = Depends(),
-        db: Session = Depends(get_db)
+        db: Session = Depends(WalletDb)
 ):
     raise_user_not_exist_if_none(db, user_id)
 
@@ -38,18 +38,18 @@ def get_wallets(
 )
 def create_wallet(
         user_id: int, wallet: schemas.WalletCreate,
-        db: Session = Depends(get_db)
+        db: Session = Depends(WalletDb)
 ):
     raise_user_not_exist_if_none(db, user_id)
 
-    if CurrenciesInterface.get_currency(db, wallet.currency_name):
+    if not CurrenciesInterface.get_currency(db, wallet.currency_name):
         raise exc.ObjectNotExist('Currency')
 
     return WalletsInterface.create_wallet(db, user_id, wallet)
 
 
 @router.get('/{wallet_id}/', response_model=schemas.Wallet)
-def get_wallet(user_id: int, wallet_id: int, db: Session = Depends(get_db)):
+def get_wallet(user_id: int, wallet_id: int, db: Session = Depends(WalletDb)):
     raise_user_not_exist_if_none(db, user_id)
 
     wallet = WalletsInterface.get_user_wallet(db, user_id, wallet_id)
@@ -64,7 +64,9 @@ def get_wallet(user_id: int, wallet_id: int, db: Session = Depends(get_db)):
     '/{wallet_id}/', status_code=status.HTTP_204_NO_CONTENT,
     response_class=Response
 )
-def delete_wallet(user_id: int, wallet_id: int, db: Session = Depends(get_db)):
+def delete_wallet(
+        user_id: int, wallet_id: int, db: Session = Depends(WalletDb)
+):
     raise_user_not_exist_if_none(db, user_id)
 
     wallet = WalletsInterface.get_user_wallet(db, user_id, wallet_id)

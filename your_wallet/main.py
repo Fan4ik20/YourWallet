@@ -1,75 +1,73 @@
-from fastapi import FastAPI, Request, status
-from fastapi.responses import JSONResponse
+from typing import TypeAlias
+
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-import config
-import exc
+from exceptions import handlers, exc
 
+from database.settings import create_db_engine, create_sessionmaker
 from database.interfaces.db_interface import DbInterface
 
-from routers import users
-from routers import currencies
-from routers import user_wallets
-from routers.transactions import categories
-from routers.transactions import wallet_transactions
+from dependencies import WalletDb, get_db_session
 
-app = FastAPI(docs_url='/api/v1/docs/')
-DbInterface.create_tables()
+from routers import wallet_router
 
-origins = [
-    "http://127.0.0.1:5000",
-    "http://localhost:5000",
-]
+from config import AppSettings
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-app.include_router(users.router, prefix='/api/v1')
-app.include_router(currencies.router, prefix='/api/v1')
-app.include_router(user_wallets.router, prefix='/api/v1')
-app.include_router(categories.router, prefix='/api/v1')
-app.include_router(wallet_transactions.router, prefix='/api/v1')
+url: TypeAlias = str
 
 
-@app.exception_handler(exc.ObjectNotExist)
-def object_not_exist_handler(
-        request: Request, exc_: exc.ObjectNotExist
-) -> JSONResponse:
-    return JSONResponse(
-        status_code=status.HTTP_404_NOT_FOUND,
-        content={
-            'message': f'{exc_.model} with given identifier does not exist!',
-            'place': 'Path'
-        }
+def include_routers(app_: FastAPI) -> None:
+    app_.include_router(wallet_router.router, prefix='/api/v1')
+
+
+def include_handlers(app_: FastAPI) -> None:
+    app_.add_exception_handler(
+        exc.ObjectNotExist, handlers.object_not_exist_handler
+    )
+    app_.add_exception_handler(
+        exc.ObjectNotExistInBody, handlers.object_not_exist_handler
+    )
+    app_.add_exception_handler(
+        exc.ObjectWithGivenAttrExist,
+        handlers.object_with_given_attr_exist_handler
     )
 
 
-@app.exception_handler(exc.ObjectWithGivenAttrExist)
-def object_with_given_attr_exist_handler(
-        request: Request, exc_: exc.ObjectWithGivenAttrExist
-) -> JSONResponse:
-    return JSONResponse(
-        status_code=status.HTTP_409_CONFLICT,
-        content={
-            'message': f'{exc_.model} with given {exc_.attr} already exist',
-            'place': 'Path'
-        }
+def include_cors(app_: FastAPI, origins: list[url]) -> None:
+    app_.add_middleware(
+        CORSMiddleware,
+        allow_origins=origins,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
     )
 
 
-@app.exception_handler(exc.ObjectNotExistInBody)
-def object_not_exist_in_body_handler(
-        request: Request, exc_: exc.ObjectNotExistInBody
-) -> JSONResponse:
-    return JSONResponse(
-        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-        content={
-            'message': f'{exc_.model} with given identifier does not exist!',
-            'place': 'Body'
-        }
-    )
+def include_db(app_: FastAPI, config: AppSettings) -> None:
+    wallet_engine = create_db_engine(config)
+    wallet_sessionmaker = create_sessionmaker(wallet_engine)
+
+    DbInterface.create_tables(wallet_engine)
+
+    app_.dependency_overrides[WalletDb] = get_db_session(wallet_sessionmaker)
+
+
+def create_app() -> FastAPI:
+    wallet_app = FastAPI(docs_url='/api/v1/docs/', debug=True)
+    wallet_settings = AppSettings(_env_file='.env')
+
+    origins = [
+        "http://127.0.0.1:5000",
+        "http://localhost:5000",
+    ]
+
+    include_db(wallet_app, wallet_settings)
+    include_handlers(wallet_app)
+    include_cors(wallet_app, origins)
+    include_routers(wallet_app)
+
+    return wallet_app
+
+
+app = create_app()
